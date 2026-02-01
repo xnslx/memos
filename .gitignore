@@ -27,3 +27,7 @@ dist
 
 # Git worktrees
 .worktrees/
+.env
+.env.*
+web/.env
+web/.env.*
