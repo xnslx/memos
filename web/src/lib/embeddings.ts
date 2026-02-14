@@ -327,7 +327,10 @@ function parseEmbedding(embedding: unknown): number[] {
         return parsed;
       }
     } catch {
-      console.error('Failed to parse embedding string:', embedding.slice(0, 50));
+      console.error(
+        'Failed to parse embedding string:',
+        embedding.slice(0, 50)
+      );
     }
   }
 
@@ -371,7 +374,9 @@ export async function getAllMemoEmbeddings(): Promise<MemoEmbedding[]> {
     return (data || []).map((item) => ({
       ...item,
       embedding: parseEmbedding(item.embedding),
-      intent_embedding: item.intent_embedding ? parseEmbedding(item.intent_embedding) : null,
+      intent_embedding: item.intent_embedding
+        ? parseEmbedding(item.intent_embedding)
+        : null,
     }));
   } catch (err) {
     console.error('Error in getAllMemoEmbeddings:', err);

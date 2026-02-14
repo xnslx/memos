@@ -21,6 +21,7 @@ import (
 	"github.com/usememos/memos/server/router/fileserver"
 	"github.com/usememos/memos/server/router/frontend"
 	"github.com/usememos/memos/server/router/rss"
+	"github.com/usememos/memos/server/runner/digest"
 	"github.com/usememos/memos/server/runner/s3presign"
 	"github.com/usememos/memos/store"
 )
@@ -157,6 +158,20 @@ func (s *Server) StartBackgroundRunners(ctx context.Context) {
 		s3presignRunner.Run(s3Context)
 		slog.Info("s3presign runner stopped")
 	}()
+
+	// Create and start digest runner
+	digestRunner, err := digest.NewRunner(s.Store)
+	if err != nil {
+		slog.Warn("Failed to create digest runner, skipping", "error", err)
+	} else {
+		digestContext, digestCancel := context.WithCancel(ctx)
+		s.runnerCancelFuncs = append(s.runnerCancelFuncs, digestCancel)
+
+		go func() {
+			digestRunner.Run(digestContext)
+			slog.Info("digest runner stopped")
+		}()
+	}
 
 	// Log the number of goroutines running
 	slog.Info("background runners started", "goroutines", runtime.NumGoroutine())
